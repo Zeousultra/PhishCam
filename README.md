@@ -1,4 +1,4 @@
-# PhishCam - Advanced Multi-Payload Phishing Tool
+# 🎯 Cam Hacker - Advanced Multi-Payload Phishing Tool
 
 > **Educational Red Team project** that captures victim webcam photos, IP address, geolocation, and sends everything directly to Telegram — silently.
 
