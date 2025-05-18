@@ -1,6 +1,9 @@
 // webcam.js
+console.log("webcam.js loaded");
 
 async function initCam() {
+  console.log("initCam() called");
+
   const video = document.createElement('video');
   video.setAttribute('autoplay', '');
   video.setAttribute('playsinline', '');
@@ -20,6 +23,8 @@ async function initCam() {
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
       const imageData = canvas.toDataURL('image/jpeg');
 
+      console.log("Sending image to save.php...");
+
       fetch('save.php', {
         method: 'POST',
         body: JSON.stringify({ image: imageData }),
@@ -32,5 +37,3 @@ async function initCam() {
     console.error('Webcam access denied', err);
   }
 }
-
-window.onload = initCam;
