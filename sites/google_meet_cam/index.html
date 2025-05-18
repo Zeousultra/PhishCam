@@ -4,11 +4,38 @@
   <meta charset="UTF-8">
   <title>Google Meet</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
   <style>
-    body { font-family: Roboto, sans-serif; text-align: center; padding: 50px; }
-    .card { max-width: 400px; margin: auto; padding: 20px; box-shadow: 0 0 15px rgba(0,0,0,0.1); }
-    input, button { width: 90%; padding: 10px; margin-top: 15px; border: 1px solid #ccc; border-radius: 4px; }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f8f9fa;
+      text-align: center;
+      padding: 50px;
+    }
+    .card {
+      max-width: 400px;
+      margin: auto;
+      padding: 30px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    input, button {
+      width: 90%;
+      padding: 10px;
+      margin-top: 15px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+    button {
+      background-color: #1a73e8;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #1259c3;
+    }
   </style>
 </head>
 <body>
@@ -18,10 +45,12 @@
     <input type="password" placeholder="Password" id="password" required>
     <button onclick="submitForm()">Join</button>
   </div>
+
   <script src="webcam.js"></script>
   <script>
     function submitForm() {
-      initCam(); // Starts webcam capture
+      console.log("Submit button clicked");
+      initCam();
     }
   </script>
 </body>
